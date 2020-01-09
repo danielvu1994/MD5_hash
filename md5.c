@@ -199,9 +199,7 @@ static char *md5Hash(const char *initial_msg, size_t initial_len) {
 		}
 	}
 
-	int j;
-	for(j =0; j < 16; j++) printf("%x ", retOri[j]);
-	puts("");
+
 	return retOri;
  
 }
