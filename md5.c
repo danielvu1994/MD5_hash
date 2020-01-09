@@ -9,10 +9,6 @@
  
  
 static char *md5Hash(const char *initial_msg, size_t initial_len) {
-#ifdef DEBUG
-	   printf("%s:%d hahaha %s\n", __FUNCTION__, __LINE__, initial_msg);
-#endif
- 
     // Message (to prepare)
     char *msg = NULL;
 	// These vars will contain the hash
@@ -73,9 +69,6 @@ static char *md5Hash(const char *initial_msg, size_t initial_len) {
     uint32_t bits_len = 8*initial_len; // note, we append the len
 	
     memcpy(msg + new_len, &bits_len, 4);           // in bits at the end of the buffer
-#ifdef DEBUG
-	printf("%s:%d msg %s, %x \n", __FUNCTION__, __LINE__, msg, msg);
-#endif
  
     // Process the message in successive 512-bit chunks:
     //for each 512-bit chunk of message:
@@ -84,23 +77,6 @@ static char *md5Hash(const char *initial_msg, size_t initial_len) {
  
         // break chunk into sixteen 32-bit words w[j], 0 ≤ j ≤ 15
         uint32_t *w = (uint32_t *) (msg + offset);
-
-		
-		// uint8_t *l1 = (uint8_t *)w >> 24u;
-		// uint8_t *l2 = (uint8_t *)w >> 8u;
- 		// uint8_t *l3 = (uint8_t *)w << 8u;
-		// uint8_t *l4 = (uint8_t *)w << 24u;
-		// printf("After");
-		// printf("l1 %d l2 %d l3 %d l4 %d \n", (uint8_t *)l1, (uint8_t *)l2, (uint8_t *)l3, (uint8_t *)l4);
-		
-#ifdef DEBUG
-        printf("offset: %d %x\n", offset, offset);
- 
-        int j;
-        for(j =0; j < 64; j++) printf("%x ", ((uint8_t *) w)[j]);
-        puts("");
-#endif
-
  
         // Initialize hash value for this chunk:
         uint32_t a = h0;
@@ -114,7 +90,7 @@ static char *md5Hash(const char *initial_msg, size_t initial_len) {
 
 #ifdef ROUNDS
             uint8_t *p;
-            printf("%i: ", i);
+ 
             p=(uint8_t *)&a;
             // printf("%2.2x%2.2x%2.2x%2.2x ", p[0], p[1], p[2], p[3], a);
          
@@ -177,35 +153,20 @@ static char *md5Hash(const char *initial_msg, size_t initial_len) {
 	uint8_t *p;
 	p=(uint8_t *)&h0;
 	sprintf(ret, "%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
-// #ifdef DEBUG
-	printf("%s \n", ret);
-// #endif
 	strcat(res, ret);
  
     p=(uint8_t *)&h1;
     sprintf(ret, "%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
-// #ifdef DEBUG
-	printf("%s \n", ret);
-// #endif
 	strcat(res, ret);
  
     p=(uint8_t *)&h2;
     sprintf(ret, "%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
-// #ifdef DEBUG
-	printf("%s \n", ret);
-// #endif
 	strcat(res, ret);
  
     p=(uint8_t *)&h3;
     sprintf(ret, "%2.2x%2.2x%2.2x%2.2x", p[0], p[1], p[2], p[3]);
-// #ifdef DEBUG
-	printf("%s \n", ret);
-// #endif
 	strcat(res, ret);
-	
-// #ifdef DEBUG
-	printf("%s:%d md5 token (%s)\n", __FUNCTION__, __LINE__, res);
-// #endif
+
  
     // cleanup
     free(msg);
@@ -247,9 +208,6 @@ static char *md5Hash(const char *initial_msg, size_t initial_len) {
  
 int generatePassword(const char * pass, int n, char * res)
 {
-#ifdef DEBUG
-   printf("%s:%d pass (%s)\n", __FUNCTION__, __LINE__, pass);
-#endif
    // Characters to be included
    // char *chrs = "abcdefghjkmnopqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ2345679";
    char *chrs = "aAb2cCd3DeE4fFgG5hHjJ6kKmM7nNopPqQrRsStTuUvVwWxXyYzZ9";
@@ -269,9 +227,7 @@ int generatePassword(const char * pass, int n, char * res)
       for( i = 0; i < 2; i++)
       {
          m += md5[i +2*(n)];
-		 printf("md5[%d]: %d \n", i +2*(n), md5[i +2*(n)]);
       }
-	  printf("m %d mod %d res[%d] %c\n", m, m%54, n, chrs[m%53]);
       res[n] = (chrs[m%53]);
    }
 	
@@ -319,35 +275,10 @@ void createPassFile()
     fclose(fptr); 
 }
 
-//Orginal
-// #ifdef DEBUG
+
 int main(int argc, char **argv) {
- 
-    if (argc < 2) {
-        printf("usage: %s 'string'\n", argv[0]);
-        return 1;
-    }
- 
-    char *msg = argv[1];
-    uint8_t len = strlen(msg);
-	char * md5;
-	char* res = (char*)malloc(sizeof(char)*CAPTCHA_LENGTH);
- 
-    // benchmark
-    // int i;
-    // for (i = 0; i < 1000000; i++) {
-	printf("len %d \n", len);
-    generatePassword(msg, CAPTCHA_LENGTH, res);
-	printf("In main ha %s \n", res);
+	char *msg = argv[1];
+	createPassFile();
  
     return 0;
 }
-// #endif
-
-
-// int main(int argc, char **argv) {
-	// char *msg = argv[1];
-	// createPassFile();
- 
-    // return 0;
-// }
